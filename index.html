@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+    <script type="text/javascript" src="/three.js"></script>
+    <script src="/TrackballControls.js"></script>
+
+	</head>
+	<body onload="start()" style="background:#888888;">
+
+  <div id="container"></div>
+
+    
+  <!-- ----- MAIN THREE.JS CODE ----- -->   
+ 
+  <script type="text/javascript">
+  
+  function start() {
+
+    container = document.getElementById( 'container' );
+
+    // --- WebGl render
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );
+
+    scene = new THREE.Scene();
+
+    // --- Camera
+
+    camera = new THREE.PerspectiveCamera( 45, renderer.domElement.width/renderer.domElement.height );
+    camera.position.z = -500;
+    camera.lookAt(scene.position);
+    
+    controls = new THREE.TrackballControls( camera, renderer.domElement );
+    controls.rotateSpeed = 3.0;
+    controls.dynamicDampingFactor = 0.3;
+   
+    // --- Lights
+        
+    pointLight = new THREE.PointLight( 0xffffff );
+    scene.add( pointLight );
+    
+    var sphere1          = new THREE.SphereGeometry( 5, 8, 8 );
+    light               = new THREE.Mesh( sphere1, new THREE.MeshBasicMaterial( { color:0xffffff } ) );
+    light.position      = pointLight.position;
+    scene.add(light);
+
+
+    // MATERIAL
+    
+    var shader = THREE.ShaderLib[ "normalmap" ];
+    uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+    
+    var material = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            vertexShader: shader.vertexShader,
+            fragmentShader: shader.fragmentShader,
+            lights: true
+    } );
+    
+    
+    // GEOMETRY
+
+    geometry = new THREE.SphereGeometry( 100, 32, 32);
+    geometry.computeTangents();
+    
+    var sphere2 = new THREE.Mesh( geometry, material);
+   
+    scene.add(sphere2);
+    
+    t = 0;
+    setInterval( loop, 1000 / 60 );
+  }
+
+  function loop() {
+    t+= 0.01;
+
+    light.position.x = 200 * Math.cos( t );
+    light.position.z = 200 * Math.sin( t );
+    renderer.clear();
+    renderer.render(scene, camera);
+    controls.update(); // trackball interaction
+  }
+      
+  </script>
+  
+	</body>
+</html>
