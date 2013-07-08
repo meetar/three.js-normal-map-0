@@ -49,6 +49,7 @@
 
     // MATERIAL
     
+    var shader = THREE.ShaderLib[ "normalmap" ];
     uniforms = THREE.UniformsUtils.clone( shader.uniforms );
     
     var material = new THREE.ShaderMaterial( {
