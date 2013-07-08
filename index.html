@@ -49,12 +49,12 @@
 
     // MATERIAL
     
-    var shader = THREE.ShaderLib[ "normalmap" ];
+    // var shader = THREE.ShaderLib[ "normalmap" ];
     uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-    uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "white.png" );
+    // uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "white.png" );
     // uniforms[ "uNormalScale" ].value.set( 1.0, 1.0 );
     // uniforms[ "uNormalScale" ].value.y = -1;
-    uniforms[ "uNormalScale" ].value.set(0.0, 0.0 );
+    // uniforms[ "uNormalScale" ].value.set(0.0, 0.0 );
     // uniforms[ "uNormalScale" ].value.set(-1.0, 0.0 );
     // uniforms[ "uNormalScale" ].value.set(0.0, -1.0 );
     // uniforms[ "uNormalScale" ].value.set(-1.0, -1.0 );
