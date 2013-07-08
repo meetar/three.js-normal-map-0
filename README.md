@@ -12,6 +12,8 @@ http://stackoverflow.com/questions/17453298/twisted-normals-with-the-three-js-no
 
 - [Including a displacement map, showing normals that are still flat:](http://meetar.github.io/three.js-normal-map-0/index3.html)
 
+- [Attempting to use default normals with displacement map, showing twisted normals:](http://meetar.github.io/three.js-normal-map-0/index5.html)
+
 I asked this question: http://stackoverflow.com/questions/17528878/compute-normals-from-displacement-map-in-three-js-r-58
 
 - [With an experimental method of recalculating normals post-displacement (not working):](http://meetar.github.io/three.js-normal-map-0/index4.html)
