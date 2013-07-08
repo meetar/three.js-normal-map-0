@@ -1,8 +1,8 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-    <script type="text/javascript" src="/three.js"></script>
-    <script src="/TrackballControls.js"></script>
+    <script type="text/javascript" src="Three.js"></script>
+    <script src="TrackballControls.js"></script>
 
 	</head>
 	<body onload="start()" style="background:#888888; margin:0px; padding:0px" onmousemove="update()">
@@ -220,10 +220,10 @@
     var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
     
     
-    uniforms[ "tDisp" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( '/dots.png' )};
+    uniforms[ "tDisp" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( 'dots.png' )};
     uniforms[ "uDisplacementScale" ].value = 50;
     
-    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( '/white.png' );
+    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( 'white.png' );
     uniforms[ "uNormalScale" ].value = ( 0.0, 0.0 );
     
     uniforms[ "uPointLightPos"] =   { type: "v3", value: pointLight.position },
