@@ -47,14 +47,12 @@
     
     void main() {
 
-      // vec4 mPosition = objectMatrix * vec4( position, 1.0 ); // from moon demo - outdated?
       vec4 mPosition = modelMatrix * vec4( position, 1.0 );     // from ninja demo
-      vViewPosition = cameraPosition - mPosition.xyz;
 
       vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
       vNormal = normalize( normalMatrix * normal );
 
-      //tangent and binormal vectors
+      // tangent and binormal vectors
       vTangent = normalize( normalMatrix * tangent.xyz );
 
       vBinormal = cross( vNormal, vTangent ) * tangent.w;
@@ -72,8 +70,14 @@
         vec4 displacedPosition  = vec4( vNormal.xyz * df, 0.0 ) + mvPosition;
 
         gl_Position             = projectionMatrix * displacedPosition;
+
+        vViewPosition = -displacedPosition.xyz; // from webgl_cubes_indexed demo
       #else
         gl_Position = projectionMatrix * mvPosition;
+
+        //vViewPosition = cameraPosition - mPosition.xyz; // original
+      vViewPosition = -mvPosition.xyz; // from webgl_cubes_indexed demo
+
       #endif
     }
 
@@ -119,13 +123,16 @@
       mat3 tsb            = mat3( vTangent, vBinormal, vNormal );
       vec3 viewPosition   = normalize( vViewPosition );
       
-      // toggle these lines depending on whether you're using a normal texture
-      // vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
+      // toggle these lines depending on whether you're using a normal texture:
+      
+      //vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
       vec3 finalNormal       = vec3( vNormal );           // works without tNormal
 
-      // toggle these lines for experimental normal recaculation
-      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );   // normals recaculated, still seem to be wrong, and position is wrong
-      // vec3 normal         = normalize( finalNormal );  // light position is correct, but normals aren't
+      
+      // toggle these lines for experimental normal recaculation:
+      
+      // vec3 normal         = normalize( finalNormal );  // original; light position is correct, but normals ignore displacement
+      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );    // from webgl_cubes_indexed demo; normals recaculated, still seem to be flat
 
       
       // point light
@@ -250,11 +257,11 @@
     
     // none of these seem to have any effect on post-displacement normals
     
-    //geometry.tangentsNeedUpdate = true;
-    //geometry.computeFaceNormals();
-    //geometry.computeVertexNormals();
-    //geometry.verticesNeedUpdate = true;
-    //geometry.normalsNeedUpdate = true;
+    geometry.tangentsNeedUpdate = true;
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    geometry.verticesNeedUpdate = true;
+    geometry.normalsNeedUpdate = true;
     
     
     t = 0;
