@@ -129,10 +129,10 @@
       vec3 finalNormal       = vec3( vNormal );           // works without tNormal
 
       
-      // toggle these lines for experimental normal recaculation:
+      // toggle these lines for hard normal recaculation:
       
       // vec3 normal         = normalize( finalNormal );  // original; light position is correct, but normals ignore displacement
-      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );    // from webgl_cubes_indexed demo; normals recaculated, still seem to be flat
+      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );    // from webgl_cubes_indexed demo; normals recaculated post-displacement, hard only
 
       
       // point light
