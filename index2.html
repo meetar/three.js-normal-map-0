@@ -53,16 +53,8 @@
     
     var shader = THREE.ShaderLib[ "normalmap" ];
     uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-    uniforms[ "enableDisplacement" ].value = true;
-
-    // uniforms[ "tDiffuse" ].value = dispTexture;
-    // uniforms[ "tDisp" ].value = dispTexture;
-    // uniforms[ "tDisp" ] = { type: 't', value: dispTexture};
-    // uniforms[ "uDisplacementScale" ].value = 100;
     
-    uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "white.png" );
-    uniforms[ "uNormalScale" ].value.set(0.0, 0.0 );
+    uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "flat.png" );
     
     var material = new THREE.ShaderMaterial( {
             uniforms: uniforms,
