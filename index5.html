@@ -1,11 +1,11 @@
 <html>
-	<head>
-		<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
     <script type="text/javascript" src="Three.js"></script>
     <script src="TrackballControls.js"></script>
 
-	</head>
-	<body onload="start()" style="background:#888888; margin:0px; padding:0px" onmousemove="update()">
+  </head>
+  <body onload="start()" style="background:#888888; margin:0px; padding:0px" onmousemove="update()">
 
   <div id="container"></div>
 
@@ -26,12 +26,12 @@
     attribute float displacement;
 
     varying vec3 vTangent;
-		varying vec3 vBinormal;
-		varying vec3 vNormal;
-		varying vec2 vUv;
+    varying vec3 vBinormal;
+    varying vec3 vNormal;
+    varying vec2 vUv;
 
-		varying vec3 vPointLightVector;
-		varying vec3 vViewPosition;
+    varying vec3 vPointLightVector;
+    varying vec3 vViewPosition;
 
     uniform vec3 uPointLightPos;
 
@@ -45,16 +45,18 @@
     #endif
     
     
-		void main() {
+    void main() {
 
-      // vec4 mPosition = objectMatrix * vec4( position, 1.0 ); // from moon demo - outdated?
+      //vec4 mPosition = objectMatrix * vec4( position, 1.0 ); // from moon demo; outdated?
       vec4 mPosition = modelMatrix * vec4( position, 1.0 );     // from ninja demo
-      vViewPosition = cameraPosition - mPosition.xyz;
 
       vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
       vNormal = normalize( normalMatrix * normal );
 
-      //tangent and binormal vectors
+      //vViewPosition = cameraPosition - mPosition.xyz; // original
+      vViewPosition = -mvPosition.xyz; // from webgl_cubes_indexed demo
+
+      // tangent and binormal vectors
       vTangent = normalize( normalMatrix * tangent.xyz );
 
       vBinormal = cross( vNormal, vTangent ) * tangent.w;
@@ -75,7 +77,7 @@
       #else
         gl_Position = projectionMatrix * mvPosition;
       #endif
-		}
+    }
 
   </script>
 
@@ -119,15 +121,16 @@
       mat3 tsb            = mat3( vTangent, vBinormal, vNormal );
       vec3 viewPosition   = normalize( vViewPosition );
       
-      // toggle these lines depending on whether you're using a normal texture
+      // toggle these lines depending on whether you're using a normal texture:
       
-      vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
-      // vec3 finalNormal       = vec3( vNormal );           // works without tNormal
+      //vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
+      vec3 finalNormal       = vec3( vNormal );           // works without tNormal
 
-      // toggle these lines for experimental normal recaculation
       
-      vec3 normal         = normalize( finalNormal );  // light position is correct, but normals aren't
-      // vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );   // normals recaculated, but position is wrong
+      // toggle these lines for experimental normal recaculation:
+      
+      //vec3 normal         = normalize( finalNormal );  // original; light position is correct, but normals ignore displacement
+      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );    // from webgl_cubes_indexed demo; normals recaculated, still seem to be flat
 
       
       // point light
@@ -156,7 +159,7 @@
                     
     }
   </script>
-		
+    
     
 
     
@@ -223,7 +226,7 @@
     uniforms[ "tDisp" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( 'dots.png' )};
     uniforms[ "uDisplacementScale" ].value = 50;
     
-    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( 'white.png' );
+    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( 'flat.png' );
     uniforms[ "uNormalScale" ].value = ( 0.0, 0.0 );
     
     uniforms[ "uPointLightPos"] =   { type: "v3", value: pointLight.position },
@@ -252,11 +255,11 @@
     
     // none of these seem to have any effect on post-displacement normals
     
-    //geometry.tangentsNeedUpdate = true;
-    //geometry.computeFaceNormals();
-    //geometry.computeVertexNormals();
-    //geometry.verticesNeedUpdate = true;
-    //geometry.normalsNeedUpdate = true;
+    geometry.tangentsNeedUpdate = true;
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    geometry.verticesNeedUpdate = true;
+    geometry.normalsNeedUpdate = true;
     
     
     t = 0;
@@ -291,5 +294,5 @@
 
   </script>
   
-	</body>
+  </body>
 </html>
