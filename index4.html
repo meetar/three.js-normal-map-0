@@ -120,14 +120,12 @@
       vec3 viewPosition   = normalize( vViewPosition );
       
       // toggle these lines depending on whether you're using a normal texture
-      
-      //vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
+      // vec3 finalNormal    = tsb * normalTex.rgb;       // works with tNormal
       vec3 finalNormal       = vec3( vNormal );           // works without tNormal
 
       // toggle these lines for experimental normal recaculation
-      
-      //vec3 normal         = normalize( finalNormal );  // light position is correct, but normals aren't
-      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );   // normals recaculated, but position is wrong
+      vec3 normal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );   // normals recaculated, still seem to be wrong, and position is wrong
+      // vec3 normal         = normalize( finalNormal );  // light position is correct, but normals aren't
 
       
       // point light
@@ -223,7 +221,7 @@
     uniforms[ "tDisp" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( 'dots.png' )};
     uniforms[ "uDisplacementScale" ].value = 50;
     
-    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( 'white.png' );
+    uniforms[ "tNormal" ].value = new THREE.ImageUtils.loadTexture( 'flat.png' );
     uniforms[ "uNormalScale" ].value = ( 0.0, 0.0 );
     
     uniforms[ "uPointLightPos"] =   { type: "v3", value: pointLight.position },
