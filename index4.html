@@ -1,11 +1,11 @@
 <html>
-	<head>
-		<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
     <script type="text/javascript" src="Three.js"></script>
     <script src="TrackballControls.js"></script>
 
-	</head>
-	<body onload="start()" style="background:#888888; margin:0px; padding:0px" onmousemove="update()">
+  </head>
+  <body onload="start()" style="background:#888888; margin:0px; padding:0px" onmousemove="update()">
 
   <div id="container"></div>
 
@@ -26,12 +26,12 @@
     attribute float displacement;
 
     varying vec3 vTangent;
-		varying vec3 vBinormal;
-		varying vec3 vNormal;
-		varying vec2 vUv;
+    varying vec3 vBinormal;
+    varying vec3 vNormal;
+    varying vec2 vUv;
 
-		varying vec3 vPointLightVector;
-		varying vec3 vViewPosition;
+    varying vec3 vPointLightVector;
+    varying vec3 vViewPosition;
 
     uniform vec3 uPointLightPos;
 
@@ -45,7 +45,7 @@
     #endif
     
     
-		void main() {
+    void main() {
 
       // vec4 mPosition = objectMatrix * vec4( position, 1.0 ); // from moon demo - outdated?
       vec4 mPosition = modelMatrix * vec4( position, 1.0 );     // from ninja demo
@@ -75,7 +75,7 @@
       #else
         gl_Position = projectionMatrix * mvPosition;
       #endif
-		}
+    }
 
   </script>
 
@@ -154,7 +154,7 @@
                     
     }
   </script>
-		
+    
     
 
     
@@ -289,5 +289,5 @@
 
   </script>
   
-	</body>
+  </body>
 </html>
