@@ -1,0 +1,246 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="Three.js"></script>
+    <script src="TrackballControls.js"></script>
+
+  </head>
+  <body style="background:#888888; margin:0px; padding:0px">
+
+  <canvas id="normalCanvas" style="position: absolute; display:none"></canvas>
+  <div id="container"></div>
+
+  
+  <!-- ----- IMAGE PROCESSING CODE ----- -->   
+  
+  <script type="text/javascript">
+  
+  // normal map calculation setup
+      
+  var heightMap = new Image();
+  heightMap.src = 'dots.png';
+  
+  // once it's loaded, convert it
+  heightMap.onload = function() {
+
+    var normalMap = document.getElementById( 'normalCanvas' );
+    
+    normalMap.width = heightMap.width;
+    normalMap.height = heightMap.height;
+
+    normalMap.getContext( '2d' ).drawImage( heightMap, 0, 0 );
+
+    height2normal( normalMap );
+    
+    // after image is processed, begin start sequence
+    start()
+
+  };
+
+  // height2normal - www.mrdoob.com/lab/javascript/height2normal/
+  function height2normal( canvas ) {
+
+    var context = canvas.getContext( '2d' );
+
+    var width = canvas.width;
+    var height = canvas.height;
+
+    var src = context.getImageData( 0, 0, width, height );
+    var dst = context.createImageData( width, height );
+
+    for ( var i = 0, l = width * height * 4; i < l; i += 4 ) {
+
+      var x1, x2, y1, y2;
+
+      if ( i % ( width * 4 ) == 0 ) {
+        // left edge
+        x1 = src.data[ i ];
+        x2 = src.data[ i + 4 ];
+      } else if ( i % ( width * 4 ) == ( width - 1 ) * 4 ) {
+        // right edge
+        x1 = src.data[ i - 4 ];
+        x2 = src.data[ i ];
+      } else {
+        x1 = src.data[ i - 4 ];
+        x2 = src.data[ i + 4 ];
+      }
+
+      if ( i < width * 4 ) {
+        // top edge
+        y1 = src.data[ i ];
+        y2 = src.data[ i + width * 4 ];
+      } else if ( i > width * ( height - 1 ) * 4) {
+        // bottom edge
+        y1 = src.data[ i - width * 4 ];
+        y2 = src.data[ i ];
+      } else {
+        y1 = src.data[ i - width * 4 ];
+        y2 = src.data[ i + width * 4 ];
+      }
+
+      dst.data[ i ] = ( x1 - x2 ) + 127;
+      dst.data[ i + 1 ] = ( y1 - y2 ) + 127;
+      dst.data[ i + 2 ] = 255;
+      dst.data[ i + 3 ] = 255;
+    }
+
+    context.putImageData( dst, 0, 0 );
+  }
+
+  </script>
+  
+  
+  <!-- ----- MAIN THREE.JS CODE ----- -->   
+ 
+  <script type="text/javascript">
+
+  function start() {
+
+    container = document.getElementById( 'container' );
+
+    // --- WebGl render
+
+    try {
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.autoClear = false;
+        container.appendChild( renderer.domElement );
+    }
+    catch (e) {
+        alert(e);
+    }
+
+    scene = new THREE.Scene();
+
+    // --- Camera
+
+    var fov = 45; // camera field-of-view in degrees
+    var width = renderer.domElement.width;
+    var height = renderer.domElement.height;
+    var aspect = width / height; // view aspect ratio
+    camera = new THREE.PerspectiveCamera( fov, aspect );
+    camera.position.z = -500;
+
+    controls = new THREE.TrackballControls( camera, renderer.domElement );
+    controls.rotateSpeed = 3.0;
+    controls.addEventListener( 'change', render );
+
+
+    
+    // --- Lights
+        
+    pointLight = new THREE.PointLight( 0xffffff, .75 ); // ( color, intensity )
+    scene.add( pointLight );
+    
+    ambientLight = new THREE.AmbientLight( 0x333333 ); // ( color, intensity )
+    // scene.add( ambientLight );
+    
+    directionalLight = new THREE.DirectionalLight( 0xffffff, .5 ); // ( color, intensity )
+		directionalLight.position.set( -1, 1, 0.5 ).normalize();
+		// scene.add( directionalLight );
+
+    var ball          = new THREE.SphereGeometry( 100, 8, 8 );
+    light             = new THREE.Mesh( ball, new THREE.MeshBasicMaterial( { color:0xffffff } ) );
+    light.position    = pointLight.position;
+    light.scale.x     = light.scale.y = light.scale.z = 0.05;
+    scene.add(light);
+
+
+    // --- MATERIAL
+
+		// -- normal map shader
+
+    var shader = THREE.ShaderLib[ "normalmap" ];
+    var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+    var ambient = 0xffffff, diffuse = 0xffffff, specular = 0xffffff, shininess = 40, scale = 23;
+
+    // -- displacement
+    
+    var heightMapTex = new THREE.Texture( heightMap );
+    heightMapTex.needsUpdate = true;
+    uniforms[ "enableDisplacement" ].value = true; // enables tDisplacement
+    uniforms[ "tDisplacement" ] = { type: 't', value: heightMapTex};
+    // uniforms[ "uDisplacementBias" ].value = -1;
+    uniforms[ "uDisplacementScale" ].value = 50;
+
+    // -- normal
+    
+    var normalTexture = new THREE.Texture( document.getElementById("normalCanvas") );
+    normalTexture.needsUpdate = true;
+    uniforms[ "tNormal" ] = { type: 't', value: normalTexture};
+    // uniforms[ "uNormalScale" ].value.y = 1.0;
+
+    // -- diffuse
+    
+    // uniforms[ "enableDiffuse" ].value = true; // enables tDiffuse - overrides uDiffuseColor
+    uniforms[ "tDiffuse" ] = { type: 't', value: normalTexture};
+    uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
+
+    // -- specular
+
+    // uniforms[ "enableSpecular" ].value = true; // enables tSpecular - overrides uSpecularColor
+    uniforms[ "uSpecularColor" ].value.setHex( specular );
+    uniforms[ "uShininess" ].value = shininess; // specular power/eccentricity/glossiness
+    
+    uniforms[ "uPointLightPos"] =   { type: "v3", value: pointLight.position },
+    uniforms[ "uPointLightColor" ] = {type: "c", value: new THREE.Color( pointLight.color )};
+    uniforms[ "uAmbientLightColor" ] = {type: "c", value: new THREE.Color( ambientLight.color )};
+    uniforms[ "uAmbientColor" ].value.setHex( ambient ); // material's ambient color
+
+    uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
+    uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
+    uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+
+    // -- unused uniforms
+    
+    // uniforms[ "tCube" ].value = reflectionCube;
+    // uniforms[ "uReflectivity" ].value = 0.1;
+    // uniforms[ "enableAO" ].value = true;
+    // uniforms[ "enableReflection" ].value = true;
+
+    var material = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            lights: true
+    } );
+    
+    // --- GEOMETRY
+
+    // set up the sphere vars
+    var radius = 100,
+        segments = 60,
+        rings = 60;
+
+    geometry = new THREE.SphereGeometry( radius, segments, rings);
+    geometry.computeTangents();
+    var sphere = new THREE.Mesh( geometry, material);
+    scene.add(sphere);
+    
+    
+    t = -3;
+    diameter = 200;
+    
+    setInterval( loop, 1000 / 60 );
+
+  }
+  
+  function loop() {
+    t+= 0.01;
+
+    light.position.x = diameter * Math.cos( t );
+    light.position.z = diameter * Math.sin( t );
+
+    render();
+    controls.update(); // trackball interaction
+  }
+  
+  function render() {
+    renderer.clear();
+    renderer.render(scene, camera);
+  }
+  
+  </script>
+  
+  </body>
+</html>
