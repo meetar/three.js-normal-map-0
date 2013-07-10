@@ -16,4 +16,4 @@ I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.c
 
 - [Recalculating post-displacement normals in the fragment shader](http://meetar.github.io/three.js-normal-map-0/index6.html) - hard edges only
 
-- [Recalculating post-displacement normals with JavaScript](http://meetar.github.io/three.js-normal-map-0/index6.html) - smoothed
+- [Recalculating post-displacement normals with JavaScript](http://meetar.github.io/three.js-normal-map-0/index14.html) - smoothed
