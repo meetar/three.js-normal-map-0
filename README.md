@@ -14,4 +14,6 @@ http://stackoverflow.com/questions/17453298/twisted-normals-with-the-three-js-no
 
 I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.com/questions/17528878/compute-normals-from-displacement-map-in-three-js-r-58
 
-- [With a method of recalculating post-displacement normals - hard only:](http://meetar.github.io/three.js-normal-map-0/index6.html)
+- [Recalculating post-displacement normals in the fragment shader:](http://meetar.github.io/three.js-normal-map-0/index6.html) - hard edges only
+
+- [Recalculating post-displacement normals with JavaScript:](http://meetar.github.io/three.js-normal-map-0/index6.html) - smoothed!
