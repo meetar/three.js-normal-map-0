@@ -24,7 +24,8 @@ I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.c
 **Getting specular right**
 
 - [Flat normal map with disconnected specular](http://meetar.github.io/three.js-normal-map-0/spec01.html)
+- [Flat normal map with correct specular](http://meetar.github.io/three.js-normal-map-0/spec01.html) - had to use pointVector instead of pointHalfVector as in many examples.
 
-**Using displacement map as a bump map**
+**Getting normals from displacement map**
 
-- [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders - showing noisy but correct normals
+- [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders, showing noisy but correct normals. This uses Morten Mikkelsen's method of taking the derivative of the heightmap: http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
