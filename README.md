@@ -27,4 +27,4 @@ I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.c
 
 **Using displacement map as a bump map**
 
-- [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders
+- [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders - showing noisy but correct normals
