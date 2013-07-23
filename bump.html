@@ -284,10 +284,10 @@
     
         // --- Lights
         
-    ambientLight = new THREE.AmbientLight( 0xcccccc );
+    ambientLight = new THREE.AmbientLight( 0x000000 );
     scene.add( ambientLight );
 
-    pointLight = new THREE.PointLight( 0xffdddd );
+    pointLight = new THREE.PointLight( 0xffffff );
     scene.add( pointLight );
 
     // light sphere
@@ -310,7 +310,7 @@
     uniforms = THREE.UniformsUtils.clone( shader.uniforms );
     
     uniforms[ "tDisplacement" ] = { type: 't', value: dispTexture };
-    uniforms[ "uDisplacementScale" ] = { type: 'f', value: 20 };
+    uniforms[ "uDisplacementScale" ] = { type: 'f', value: 50 };
 
     uniforms[ "tNormal" ] = { type: 't', value: normalTexture };
     
