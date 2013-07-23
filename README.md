@@ -24,3 +24,7 @@ I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.c
 **Getting specular right**
 
 - [Flat normal map with disconnected specular](http://meetar.github.io/three.js-normal-map-0/spec01.html)
+
+**Using displacement map as a bump map**
+
+- [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders
