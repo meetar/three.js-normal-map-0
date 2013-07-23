@@ -1,0 +1,267 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="Three.js"></script>
+    <script src="TrackballControls.js"></script>
+
+  </head>
+  <body style="background:#888888; margin:0px; padding:0px">
+
+  <div id="container"></div>
+
+  
+  
+  
+  
+  <!-- ----- VERTEX SHADER ----- -->
+  <script id="vertex_shader" type="x-shader/x-vertex">
+
+    attribute vec4 tangent; 
+    attribute float amplitude;
+    attribute float displacement;
+
+    varying vec3 vTangent;
+		varying vec3 vBinormal;
+		varying vec3 vNormal;
+		varying vec2 vUv;
+
+		varying vec3 vPointLightVector;
+		varying vec3 vViewPosition;
+
+    uniform vec3 uPointLightPos;
+
+    
+    
+		void main() {
+
+      vec4 mPosition = modelMatrix * vec4( position, 1.0 );     // from ninja demo
+      vViewPosition = cameraPosition - mPosition.xyz;
+
+      vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+      vNormal = normalize( normalMatrix * normal );
+
+      //tangent and binormal vectors
+      vTangent = normalize( normalMatrix * tangent.xyz );
+
+      vBinormal = cross( vNormal, vTangent ) * tangent.w;
+      vBinormal = normalize( vBinormal );
+
+      vUv = uv;
+
+      // point light
+      vec4 lPosition      = viewMatrix * vec4( uPointLightPos, 1.0 );
+      vPointLightVector   = normalize( lPosition.xyz - mvPosition.xyz );
+
+      gl_Position = projectionMatrix * mvPosition;
+		}
+
+  </script>
+
+    
+    
+    
+  <!-- ----- FRAGMENT SHADER ----- -->    
+  
+    <script id="fragment_shader" type="x-shader/x-fragment">
+
+    uniform vec3 uPointLightPos;
+
+    uniform vec3 uAmbientLightColor;
+    uniform vec3 uPointLightColor;
+
+    uniform vec3 uAmbientColor;
+    uniform vec3 uDiffuseColor;
+    uniform vec3 uSpecularColor;
+    uniform float uShininess; //
+    
+    uniform sampler2D tDiffuse;
+    uniform sampler2D tNormal;
+    uniform sampler2D tSpec;  //
+    uniform sampler2D tOcc; //
+
+    uniform float uNormalScale; //
+
+    varying vec3 vTangent;
+    varying vec3 vBinormal;
+    varying vec3 vNormal;
+    varying vec2 vUv;
+
+    varying vec3 vPointLightVector;
+    varying vec3 vViewPosition;
+    
+    void main() {
+
+      vec3 diffuseTex     = texture2D( tDiffuse, vUv ).xyz;
+
+      vec3 normalTex      = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;
+      mat3 tsb            = mat3( vTangent, vBinormal, vNormal );
+      vec3 finalNormal    = tsb * normalTex.rgb;
+
+      vec3 normal         = normalize( finalNormal );
+      vec3 viewPosition   = normalize( vViewPosition );      
+      
+      
+      
+      // point light
+
+      vec4 pointDiffuse           = vec4( 0.0, 0.0, 0.0, 0.0 );
+      vec4 pointSpecular          = vec4( 0.0, 0.0, 0.0, 0.0 ); //
+      
+      vec3 pointVector            = normalize( vPointLightVector );
+      vec3 pointHalfVector        = normalize( vPointLightVector - vViewPosition );
+
+      // float pointDotNormalHalf    = dot( normal, pointHalfVector );  // original - gives wrong spec for me
+      float pointDotNormalHalf    = dot( normal, pointVector );  // correct spec
+      float pointDiffuseWeight    = max( dot( normal * 2.0, pointVector ), 0.0 );
+
+      float pointSpecularWeight   = 0.0;  //
+      if ( pointDotNormalHalf >= 0.0 )    pointSpecularWeight += pow( pointDotNormalHalf, 60.0 );
+
+      pointDiffuse               += vec4( uDiffuseColor, 1.0 ) * pointDiffuseWeight;
+      pointSpecular              += vec4( uSpecularColor, 1.0 ) * pointSpecularWeight; //
+      
+      // pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;
+
+      // all lights contribution summation
+
+      vec4 totalLight             = vec4( uAmbientLightColor * uAmbientColor, 1.0 );
+      totalLight                 += vec4( uPointLightColor, 1.0 ) * ( pointDiffuse + pointSpecular );
+
+      // gl_FragColor = vec4( (diffuseTex * totalLight.xyz), 1.0 );                    
+      gl_FragColor = vec4( totalLight.xyz, 1.0 );
+    }
+    </script>
+    
+    
+
+    
+    
+    
+    
+  <!-- ----- MAIN THREE.JS CODE ----- -->   
+ 
+  <script type="text/javascript">
+  var renderer;
+  
+  function start() {
+
+    container = document.getElementById( 'container' );
+
+    // --- WebGl render
+
+    try {
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.autoClear = false;
+        container.appendChild( renderer.domElement );
+    }
+    catch (e) {
+        alert(e);
+    }
+
+    scene = new THREE.Scene();
+
+    // --- Camera
+
+    var fov = 45; // camera field-of-view in degrees
+    var width = renderer.domElement.width;
+    var height = renderer.domElement.height;
+    var aspect = width / height; // view aspect ratio
+    camera = new THREE.PerspectiveCamera( fov, aspect );
+    camera.position.z = -500;
+
+    controls = new THREE.TrackballControls( camera, renderer.domElement );
+    controls.rotateSpeed = 3.0;
+    controls.addEventListener( 'change', render );
+
+
+    
+    // --- Lights
+        
+    pointLight = new THREE.PointLight( 0x808080 );
+    scene.add( pointLight );
+    
+    var ball          = new THREE.SphereGeometry( 100, 8, 8 );
+    light               = new THREE.Mesh( ball, new THREE.MeshBasicMaterial( { color:0xffffff } ) );
+    light.position      = pointLight.position;
+    light.scale.x       = light.scale.y = light.scale.z = 0.05;
+    scene.add(light);
+
+
+    // MATERIAL
+
+		// normal map shader
+
+    var shader = THREE.ShaderLib[ "normalmap" ];
+    var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+    
+    // common material parameters
+
+    uniforms[ "tNormal" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( 'flat.png' ) };
+    // uniforms[ "uNormalScale" ].value = (0.0, 0.0);
+
+    uniforms[ "uSpecularColor" ].value.setHex( 0xff0000 );
+
+    
+    uniforms[ "uPointLightPos"] =   { type: "v3", value: pointLight.position },
+    uniforms[ "uPointLightColor" ] = {type: "c", value: new THREE.Color( pointLight.color )};
+
+    var material = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            // fragmentShader: shader.fragmentShader,
+            // vertexShader: shader.vertexShader,
+            vertexShader: document.getElementById( 'vertex_shader' ).textContent,
+            fragmentShader: document.getElementById( 'fragment_shader' ).textContent,
+            lights: true,
+            fog: false
+    } );
+    
+    // GEOMETRY
+
+    // set up the sphere vars
+    var radius = 100,
+        segments = 60,
+        rings = 60;
+
+    geometry = new THREE.SphereGeometry( radius, segments, rings);
+
+    var sphere = new THREE.Mesh( geometry, material);
+    scene.add(sphere);
+    
+    geometry.computeTangents();
+    
+    t = 0;
+    diameter = 200;
+    
+    setInterval( loop, 1000 / 60 );
+
+  }
+  
+  function loop() {
+    t+= 0.01;
+
+    light.position.x = diameter * Math.cos( t-3 );
+    light.position.z = diameter * Math.sin( t-3 );
+
+    update();
+  }
+  
+  function update() {
+    render();
+    controls.update(); // trackball interaction
+  }
+
+  function render() {
+        renderer.clear();
+        renderer.render(scene, camera);
+  }
+    
+
+  window.onload =  function() {
+      start()
+  }
+
+  </script>
+  
+  </body>
+</html>
