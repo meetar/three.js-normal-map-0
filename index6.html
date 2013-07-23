@@ -16,8 +16,6 @@
   <!-- ----- VERTEX SHADER ----- -->
   <script id="vertex_shader" type="x-shader/x-vertex">
 
-#extension GL_OES_standard_derivatives : enable
-
     uniform float p2x;
     uniform float p2y;
     uniform float p3x;
@@ -91,6 +89,8 @@
   <!-- ----- FRAGMENT SHADER ----- -->    
   
     <script id="fragment_shader" type="x-shader/x-fragment">
+
+    #extension GL_OES_standard_derivatives : enable
 
     uniform vec3 uPointLightPos;
 
