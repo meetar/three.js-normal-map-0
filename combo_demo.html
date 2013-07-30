@@ -322,7 +322,7 @@
 
     var ambient = 0x333333, diffuse = 0x333333, specular = 0xff0033, shininess = 30.0, scale = 100;
 
-    dispTexture = new THREE.ImageUtils.loadTexture( '/dots.png' );
+    dispTexture = new THREE.ImageUtils.loadTexture( 'dots.png' );
       
     var shader = THREE.ShaderLib[ "normalmap" ];
     uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -333,7 +333,7 @@
     uniforms[ "tDisplacement" ] = { type: 't', value: dispTexture };
     uniforms[ "uDisplacementScale" ] = { type: 'f', value: 50 };
 
-    uniforms[ "tNormal" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( '/flat.png' )};
+    uniforms[ "tNormal" ] = { type: 't', value: new THREE.ImageUtils.loadTexture( 'flat.png' )};
     
     uniforms[ "uDiffuseColor" ].value = new THREE.Color( diffuse );
     uniforms[ "uSpecularColor" ].value = new THREE.Color( specular );
