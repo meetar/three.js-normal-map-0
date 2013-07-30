@@ -28,3 +28,6 @@ I asked: "Can normals be recalculated post-displacement?" http://stackoverflow.c
 **Getting normals from displacement map**
 
 - [Displacement map used as a bump map](http://meetar.github.io/three.js-normal-map-0/bump.html) - using pieces of the normalmap and phong shaders, showing noisy but correct normals. This uses Morten Mikkelsen's method of taking the derivative of the heightmap: http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+
+**Getting specular right 2**
+- [Displacement, bump, and specular all from the same map](http://meetar.github.io/three.js-normal-map-0/combo_demo.html) - with the specular genes from the r.59  phong map spliced in
